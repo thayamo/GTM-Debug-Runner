@@ -1,6 +1,6 @@
 {
   "app_name": { "message": "GTM Debug Runner" },
-  "app_desc": { "message": "Unterstützt die Google®-Tag-Abdeckung, indem nicht getaggte Seiten automatisch aufgerufen und über den Google® Tag Manager korrekt erfasst werden." },
+  "app_desc": { "message": "Hilft bei der Google®-Tag-Abdeckung, indem ungetaggte Seiten automatisch aufgerufen und per Google® Tag Manager erfasst werden." },
 
   "hdr_title": { "message": "GTM Debug Runner" },
   "eta_label": { "message": "ETA: $1" },
