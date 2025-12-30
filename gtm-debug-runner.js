@@ -12,6 +12,12 @@
   const STORAGE_KEY_FILENAME = 'gtm_debug_runner_filename';
   const STORAGE_KEY_ENABLED = 'gtm_debug_runner_enabled';
   const STORAGE_KEY_UPLOAD_INVALID = 'gtm_debug_runner_upload_invalid';
+  let shadowRootRef = null;
+  let shadowHostEl = null;
+
+  function getEl(id) {
+    return (shadowRootRef || document).getElementById(id);
+  }
 
   function persistState(obj) {
     if (!chrome?.storage?.local) return;
@@ -372,11 +378,20 @@
   }
 
   function removeModal() {
-    document.getElementById('gtm-runner-overlay')?.remove();
+    getEl('gtm-runner-overlay')?.remove();
   }
 
   function ensureModal() {
-    if (document.getElementById('gtm-runner-overlay')) return;
+    if (getEl('gtm-runner-overlay')) return;
+
+    if (!shadowHostEl) {
+      shadowHostEl = document.createElement('div');
+      shadowHostEl.id = 'gtm-runner-shadow-host';
+      document.documentElement.appendChild(shadowHostEl);
+    }
+    if (!shadowRootRef) {
+      shadowRootRef = shadowHostEl.attachShadow({ mode: 'open' });
+    }
 
     const overlay = document.createElement('div');
     overlay.id = 'gtm-runner-overlay';
@@ -405,6 +420,19 @@
 
     modal.innerHTML = `
       <style>
+        :host {
+          all: initial;
+        }
+        #gtm-runner-overlay, #gtm-runner-overlay * {
+          box-sizing: border-box;
+          font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+        }
+        #gtm-runner-overlay button, #gtm-runner-overlay input {
+          all: unset;
+          font-family: inherit;
+          color: inherit;
+        }
+        #gtm-runner-overlay button { cursor: pointer; }
         @keyframes gtmRunnerBarShimmer {
           0% { background-position: 200% 0; }
           100% { background-position: -200% 0; }
@@ -448,17 +476,17 @@
               <path d="M15.5 21.1a10 10 0 0 1-12.3-4.4" stroke="url(#gradGreen)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
             </g>
           </svg>
-          <div style="font-size:18px;"><strong>GTM Debug Runner</strong></div>
+          <div style="font-size:18px; opacity:.85;"><strong>GTM Debug Runner</strong></div>
         </div>
         <div style="display: flex; align-items:center; gap:12px">
-          <div id="gtm-runner-eta" style="display:none; font-size:12px; opacity:.75;">Geschätzte Restzeit: –</div>
+          <div id="gtm-runner-eta" style="display:none; font-size:12px; opacity:.85;">Geschätzte Restzeit: –</div>
           <div id="gtm-runner-close-btn" title="Schließen" style="cursor:pointer">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
           </div>
         </div>
       </div>
 
-      <div id="gtm-runner-intro" style="margin-top:30px; margin-bottom: 20px; font-size:14px; opacity:.85; line-height:1.35;"></div>
+      <div id="gtm-runner-intro" style="margin-top:30px; margin-bottom: 20px; font-size:14px; opacity:.5; line-height:1.35;"></div>
 
       <div id="gtm-runner-upload" style="margin-top:20px; display:none;">
         <div style="display: none; font-size:12px; opacity:.5; margin-bottom:8px;">
@@ -504,18 +532,21 @@
           </button>
         </div>
 
-        <div id="gtm-runner-upload-hint" style="margin-top:10px; font-size:12px; opacity:1;"></div>
+        <div id="gtm-runner-upload-hint" style="margin-top:12px; font-size:12px; opacity:1;"></div>
       </div>
 
       <div id="gtm-runner-running-ui" style="display:none;">
-        <div id="gtm-runner-linkwrap" style="margin-top:12px;">
-          <div style="font-size:12px; opacity:.7; margin-bottom:8px;">Aktueller Link</div>
+        <div id="gtm-runner-linkwrap" style="margin-top:10px;">
+          <div style="display: flex; align-items: center; gap: 5px; font-size:12px; opacity:.85; margin-bottom:15px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" style="position: relative"><path fill="#FFF" d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm1 16.057v-3.057h2.994c-.059 1.143-.212 2.24-.456 3.279-.823-.12-1.674-.188-2.538-.222zm1.957 2.162c-.499 1.33-1.159 2.497-1.957 3.456v-3.62c.666.028 1.319.081 1.957.164zm-1.957-7.219v-3.015c.868-.034 1.721-.103 2.548-.224.238 1.027.389 2.111.446 3.239h-2.994zm0-5.014v-3.661c.806.969 1.471 2.15 1.971 3.496-.642.084-1.3.137-1.971.165zm2.703-3.267c1.237.496 2.354 1.228 3.29 2.146-.642.234-1.311.442-2.019.607-.344-.992-.775-1.91-1.271-2.753zm-7.241 13.56c-.244-1.039-.398-2.136-.456-3.279h2.994v3.057c-.865.034-1.714.102-2.538.222zm2.538 1.776v3.62c-.798-.959-1.458-2.126-1.957-3.456.638-.083 1.291-.136 1.957-.164zm-2.994-7.055c.057-1.128.207-2.212.446-3.239.827.121 1.68.19 2.548.224v3.015h-2.994zm1.024-5.179c.5-1.346 1.165-2.527 1.97-3.496v3.661c-.671-.028-1.329-.081-1.97-.165zm-2.005-.35c-.708-.165-1.377-.373-2.018-.607.937-.918 2.053-1.65 3.29-2.146-.496.844-.927 1.762-1.272 2.753zm-.549 1.918c-.264 1.151-.434 2.36-.492 3.611h-3.933c.165-1.658.739-3.197 1.617-4.518.88.361 1.816.67 2.808.907zm.009 9.262c-.988.236-1.92.542-2.797.9-.89-1.328-1.471-2.879-1.637-4.551h3.934c.058 1.265.231 2.488.5 3.651zm.553 1.917c.342.976.768 1.881 1.257 2.712-1.223-.49-2.326-1.211-3.256-2.115.636-.229 1.299-.435 1.999-.597zm9.924 0c.7.163 1.362.367 1.999.597-.931.903-2.034 1.625-3.257 2.116.489-.832.915-1.737 1.258-2.713zm.553-1.917c.27-1.163.442-2.386.501-3.651h3.934c-.167 1.672-.748 3.223-1.638 4.551-.877-.358-1.81-.664-2.797-.9zm.501-5.651c-.058-1.251-.229-2.46-.492-3.611.992-.237 1.929-.546 2.809-.907.877 1.321 1.451 2.86 1.616 4.518h-3.933z"/></svg>
+            <span>Nächste URL</span>
+          </div>
           <div id="gtm-runner-linkbox" style="
             background: rgba(255,255,255,.08);
             border: 1px solid rgba(255,255,255,.12);
             border-radius: 12px;
             padding: 10px 12px;
-            font-size: 12px;
+            font-size: 14px;
             line-height: 1.35;
             word-break: break-all;
             white-space: nowrap;
@@ -525,7 +556,7 @@
         </div>
 
         <div style="margin-top:14px;">
-          <div style="display:flex; justify-content:space-between; font-size:12px; opacity:.8;">
+          <div style="display:flex; justify-content:space-between; font-size:12px; opacity:.85;">
             <div id="gtm-runner-progress">0 / 0</div>
             <div id="gtm-runner-percent">0%</div>
           </div>
@@ -545,9 +576,9 @@
             "></div>
           </div>
 
-          <div id="gtm-runner-countdown-row" style="margin-top:10px; font-size:12px; opacity:.5; display:none;">
+          <!--<div id="gtm-runner-countdown-row" style="margin-top:10px; font-size:12px; opacity:.5;">
             Nächster Redirect in <span id="gtm-runner-countdown">3</span>s
-          </div>
+          </div>-->
         </div>
       </div>
 
@@ -601,26 +632,26 @@
     `;
 
     overlay.appendChild(modal);
-    document.documentElement.appendChild(overlay);
+    shadowRootRef.appendChild(overlay);
 
     modal.style.visibility = 'hidden';
     Promise.resolve(applySavedPos(modal)).finally(() => {
       modal.style.visibility = 'visible';
     });
 
-    const handle = document.getElementById('gtm-runner-draghandle');
+    const handle = getEl('gtm-runner-draghandle');
     if (handle) makeDraggable(modal, handle);
 
-    const cancelBtn = document.getElementById('gtm-runner-cancel');
-    const closeBtn = document.getElementById('gtm-runner-close-btn');
-    const startBtn = document.getElementById('gtm-runner-start');
-    const pauseBtn = document.getElementById('gtm-runner-pause');
-    const resumeBtn = document.getElementById('gtm-runner-resume');
-    const doneCloseBtn = document.getElementById('gtm-runner-done-close');
-    const restartBtn = document.getElementById('gtm-runner-restart');
-    const fileInput = document.getElementById('gtm-runner-file');
-    const clearBtn = document.getElementById('gtm-runner-clear');
-    const filenameEl = document.getElementById('gtm-runner-filename');
+    const cancelBtn = getEl('gtm-runner-cancel');
+    const closeBtn = getEl('gtm-runner-close-btn');
+    const startBtn = getEl('gtm-runner-start');
+    const pauseBtn = getEl('gtm-runner-pause');
+    const resumeBtn = getEl('gtm-runner-resume');
+    const doneCloseBtn = getEl('gtm-runner-done-close');
+    const restartBtn = getEl('gtm-runner-restart');
+    const fileInput = getEl('gtm-runner-file');
+    const clearBtn = getEl('gtm-runner-clear');
+    const filenameEl = getEl('gtm-runner-filename');
 
     const saved = getFilename();
     if (saved && filenameEl) filenameEl.textContent = saved;
@@ -731,7 +762,7 @@
   }
 
   function updateUploadHint() {
-    const hint = document.getElementById('gtm-runner-upload-hint');
+    const hint = getEl('gtm-runner-upload-hint');
     if (!hint) return;
     const list = getUrls();
     const hasList = list.length > 0;
@@ -749,7 +780,7 @@
   }
 
   function setStartButtonEnabled(enabled) {
-    const startBtn = document.getElementById('gtm-runner-start');
+    const startBtn = getEl('gtm-runner-start');
     if (!startBtn) return;
     startBtn.disabled = !enabled;
     startBtn.style.opacity = enabled ? '1' : '0.4';
@@ -757,12 +788,12 @@
   }
 
   function setButtonsForState(state) {
-    const cancelBtn = document.getElementById('gtm-runner-cancel');
-    const startBtn = document.getElementById('gtm-runner-start');
-    const pauseBtn = document.getElementById('gtm-runner-pause');
-    const resumeBtn = document.getElementById('gtm-runner-resume');
-    const doneCloseBtn = document.getElementById('gtm-runner-done-close');
-    const restartBtn = document.getElementById('gtm-runner-restart');
+    const cancelBtn = getEl('gtm-runner-cancel');
+    const startBtn = getEl('gtm-runner-start');
+    const pauseBtn = getEl('gtm-runner-pause');
+    const resumeBtn = getEl('gtm-runner-resume');
+    const doneCloseBtn = getEl('gtm-runner-done-close');
+    const restartBtn = getEl('gtm-runner-restart');
 
     if (!cancelBtn || !startBtn || !pauseBtn || !resumeBtn || !doneCloseBtn || !restartBtn) return;
 
@@ -813,14 +844,14 @@
   }
 
   function renderState(state) {
-    const introEl = document.getElementById('gtm-runner-intro');
-    const uploadEl = document.getElementById('gtm-runner-upload');
-    const runningUiEl = document.getElementById('gtm-runner-running-ui');
-    const cdRow = document.getElementById('gtm-runner-countdown-row');
-    const etaEl = document.getElementById('gtm-runner-eta');
-    const filenameEl = document.getElementById('gtm-runner-filename');
-    const linkWrapEl = document.getElementById('gtm-runner-linkwrap');
-    const startBtn = document.getElementById('gtm-runner-start');
+    const introEl = getEl('gtm-runner-intro');
+    const uploadEl = getEl('gtm-runner-upload');
+    const runningUiEl = getEl('gtm-runner-running-ui');
+    const cdRow = getEl('gtm-runner-countdown-row');
+    const etaEl = getEl('gtm-runner-eta');
+    const filenameEl = getEl('gtm-runner-filename');
+    const linkWrapEl = getEl('gtm-runner-linkwrap');
+    const startBtn = getEl('gtm-runner-start');
 
     const list = getUrls();
     const hasList = list.length > 0;
@@ -856,13 +887,13 @@
     let pct = total > 0 ? Math.round((done / total) * 100) : 0;
     if (isLast && pct >= 100) pct = 99;
 
-    const linkBox = document.getElementById('gtm-runner-linkbox');
-    const progressEl = document.getElementById('gtm-runner-progress');
-    const percentEl = document.getElementById('gtm-runner-percent');
-    const barEl = document.getElementById('gtm-runner-bar');
-    const etaEl = document.getElementById('gtm-runner-eta');
-    const cdEl = document.getElementById('gtm-runner-countdown');
-    const cdRow = document.getElementById('gtm-runner-countdown-row');
+    const linkBox = getEl('gtm-runner-linkbox');
+    const progressEl = getEl('gtm-runner-progress');
+    const percentEl = getEl('gtm-runner-percent');
+    const barEl = getEl('gtm-runner-bar');
+    const etaEl = getEl('gtm-runner-eta');
+    const cdEl = getEl('gtm-runner-countdown');
+    const cdRow = getEl('gtm-runner-countdown-row');
     const state = sessionStorage.getItem(STORAGE_KEY_STATE) || 'idle';
 
     if (linkBox) linkBox.textContent = url || '–';
@@ -871,7 +902,7 @@
     if (barEl && !skipBar) {
       barEl.style.width = `${pct}%`;
       if (pct >= 100) {
-        barEl.style.background = '#0A5C36';
+        barEl.style.background = '#34A853';
         barEl.style.backgroundSize = '';
         barEl.style.animation = 'none';
         barEl.style.transition = 'width 0.4s linear';
@@ -895,7 +926,7 @@
     const isLast = remaining <= 0;
     const targetPct = Math.min(100, Math.round((currentNumber / total) * 100));
     const currentPct = Math.min(100, Math.round(((currentNumber - 1) / total) * 100));
-    const barEl = document.getElementById('gtm-runner-bar');
+    const barEl = getEl('gtm-runner-bar');
     if (barEl) {
       barEl.style.transition = 'none';
       barEl.style.width = `${currentPct}%`;
