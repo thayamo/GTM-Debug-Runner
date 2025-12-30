@@ -14,6 +14,48 @@
   const STORAGE_KEY_UPLOAD_INVALID = 'gtm_debug_runner_upload_invalid';
   let shadowRootRef = null;
   let shadowHostEl = null;
+  const FALLBACK_MSG = {
+    hdr_title: 'GTM Debug Runner',
+    eta_label: 'ETA: $1',
+    intro_upload: 'Please upload a CSV from Google Tag Manager or Google Analytics 4. Untagged URLs are filtered automatically.',
+    intro_running: 'The process has started. Depending on the number of URLs and page load times this may take a while.',
+    intro_paused: 'The process is paused. Click "Resume" to continue.',
+    intro_done: 'Done! Check your Google Tag Manager or Google Analytics 4 account for current tag coverage and rerun if needed.',
+    intro_idle_ready: 'CSV loaded successfully. Click "Start" to begin.',
+    intro_idle_empty: 'Please upload a CSV (no URL list available).',
+    upload_label: 'Select CSV',
+    upload_filename_none: 'No file selected',
+    upload_hint_valid: 'Found: $1 URLs (Not tagged)',
+    upload_hint_invalid: 'The uploaded CSV is invalid and/or contains no untagged URLs.',
+    upload_clear_title: 'Clear list',
+    current_link: 'Current link',
+    countdown_prefix: 'Next redirect in',
+    countdown_suffix: 's',
+    btn_cancel: 'Cancel',
+    btn_start: 'Start',
+    btn_pause: 'Pause',
+    btn_resume: 'Resume',
+    btn_done: 'Finish',
+    btn_restart: 'Restart',
+    btn_close_title: 'Close',
+    progress_urls: 'URLs',
+    done_url_label: 'Done',
+    eta_prefix: 'ETA: $1'
+  };
+
+  function t(key, subs) {
+    if (chrome?.i18n?.getMessage) {
+      const msg = chrome.i18n.getMessage(key, subs);
+      if (msg) return msg;
+    }
+    const fb = FALLBACK_MSG[key];
+    if (!fb) return key;
+    if (!subs) return fb;
+    if (Array.isArray(subs)) {
+      return fb.replace('$1', subs[0] || '');
+    }
+    return fb.replace('$1', subs || '');
+  }
 
   function getEl(id) {
     return (shadowRootRef || document).getElementById(id);
@@ -476,11 +518,11 @@
               <path d="M15.5 21.1a10 10 0 0 1-12.3-4.4" stroke="url(#gradGreen)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
             </g>
           </svg>
-          <div style="font-size:18px; opacity:.85;"><strong>GTM Debug Runner</strong></div>
+          <div style="font-size:18px; opacity:.85;"><strong id="gtm-runner-title">${t('hdr_title')}</strong></div>
         </div>
         <div style="display: flex; align-items:center; gap:12px">
-          <div id="gtm-runner-eta" style="display:none; font-size:12px; opacity:.85;">Geschätzte Restzeit: –</div>
-          <div id="gtm-runner-close-btn" title="Schließen" style="cursor:pointer">
+          <div id="gtm-runner-eta" style="display:none; font-size:12px; opacity:.85;">${t('eta_label', '–')}</div>
+          <div id="gtm-runner-close-btn" title="${t('btn_close_title')}" style="cursor:pointer">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
           </div>
         </div>
@@ -507,11 +549,11 @@
             cursor:pointer;
           ">
             <input id="gtm-runner-file" type="file" accept=".csv" style="display:none;" />
-            <span id="gtm-runner-upload-left" style="font-size:14px; opacity:.9;">CSV auswählen</span>
-            <span id="gtm-runner-filename" style="font-size:12px; opacity:.6;">Keine Datei ausgewählt</span>
+            <span id="gtm-runner-upload-left" style="font-size:14px; opacity:.9;">${t('upload_label')}</span>
+            <span id="gtm-runner-filename" style="font-size:12px; opacity:.6;">${t('upload_filename_none')}</span>
           </label>
 
-          <button id="gtm-runner-clear" title="Liste leeren" style="
+          <button id="gtm-runner-clear" title="${t('upload_clear_title')}" style="
             appearance:none;
             display:flex;
             align-items:center;
@@ -539,7 +581,7 @@
         <div id="gtm-runner-linkwrap" style="margin-top:10px;">
           <div style="display: flex; align-items: center; gap: 5px; font-size:12px; opacity:.85; margin-bottom:15px;">
             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" style="position: relative"><path fill="#FFF" d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm1 16.057v-3.057h2.994c-.059 1.143-.212 2.24-.456 3.279-.823-.12-1.674-.188-2.538-.222zm1.957 2.162c-.499 1.33-1.159 2.497-1.957 3.456v-3.62c.666.028 1.319.081 1.957.164zm-1.957-7.219v-3.015c.868-.034 1.721-.103 2.548-.224.238 1.027.389 2.111.446 3.239h-2.994zm0-5.014v-3.661c.806.969 1.471 2.15 1.971 3.496-.642.084-1.3.137-1.971.165zm2.703-3.267c1.237.496 2.354 1.228 3.29 2.146-.642.234-1.311.442-2.019.607-.344-.992-.775-1.91-1.271-2.753zm-7.241 13.56c-.244-1.039-.398-2.136-.456-3.279h2.994v3.057c-.865.034-1.714.102-2.538.222zm2.538 1.776v3.62c-.798-.959-1.458-2.126-1.957-3.456.638-.083 1.291-.136 1.957-.164zm-2.994-7.055c.057-1.128.207-2.212.446-3.239.827.121 1.68.19 2.548.224v3.015h-2.994zm1.024-5.179c.5-1.346 1.165-2.527 1.97-3.496v3.661c-.671-.028-1.329-.081-1.97-.165zm-2.005-.35c-.708-.165-1.377-.373-2.018-.607.937-.918 2.053-1.65 3.29-2.146-.496.844-.927 1.762-1.272 2.753zm-.549 1.918c-.264 1.151-.434 2.36-.492 3.611h-3.933c.165-1.658.739-3.197 1.617-4.518.88.361 1.816.67 2.808.907zm.009 9.262c-.988.236-1.92.542-2.797.9-.89-1.328-1.471-2.879-1.637-4.551h3.934c.058 1.265.231 2.488.5 3.651zm.553 1.917c.342.976.768 1.881 1.257 2.712-1.223-.49-2.326-1.211-3.256-2.115.636-.229 1.299-.435 1.999-.597zm9.924 0c.7.163 1.362.367 1.999.597-.931.903-2.034 1.625-3.257 2.116.489-.832.915-1.737 1.258-2.713zm.553-1.917c.27-1.163.442-2.386.501-3.651h3.934c-.167 1.672-.748 3.223-1.638 4.551-.877-.358-1.81-.664-2.797-.9zm.501-5.651c-.058-1.251-.229-2.46-.492-3.611.992-.237 1.929-.546 2.809-.907.877 1.321 1.451 2.86 1.616 4.518h-3.933z"/></svg>
-            <span>Nächste URL</span>
+            <span id="gtm-runner-next-label">${t('current_link')}</span>
           </div>
           <div id="gtm-runner-linkbox" style="
             background: rgba(255,255,255,.08);
@@ -577,7 +619,7 @@
           </div>
 
           <!--<div id="gtm-runner-countdown-row" style="margin-top:10px; font-size:12px; opacity:.5;">
-            Nächster Redirect in <span id="gtm-runner-countdown">3</span>s
+            ${t('countdown_prefix')} <span id="gtm-runner-countdown">3</span>${t('countdown_suffix')}
           </div>-->
         </div>
       </div>
@@ -588,14 +630,14 @@
           background: rgba(255,255,255,.06); color:#fff;
           border-radius: 12px; padding: 10px 12px; font-size: 14px;
           cursor:pointer;
-        ">Abbrechen</button>
+        ">${t('btn_cancel')}</button>
 
         <button id="gtm-runner-start" style="
           appearance:none; border:1px solid rgba(255,255,255,.18);
           background: rgba(255,255,255,.85); color:#111;
           border-radius: 12px; padding: 10px 12px; font-size: 14px;
           cursor:pointer;
-        ">Starten</button>
+        ">${t('btn_start')}</button>
 
         <button id="gtm-runner-pause" style="
           display:none;
@@ -603,7 +645,7 @@
           background: rgba(255,255,255,.06); color:#fff;
           border-radius: 12px; padding: 10px 12px; font-size: 14px;
           cursor:pointer;
-        ">Pause</button>
+        ">${t('btn_pause')}</button>
 
         <button id="gtm-runner-resume" style="
           display:none;
@@ -611,7 +653,7 @@
           background: rgba(255,255,255,.85); color:#111;
           border-radius: 12px; padding: 10px 12px; font-size: 14px;
           cursor:pointer;
-        ">Weiter</button>
+        ">${t('btn_resume')}</button>
 
         <button id="gtm-runner-done-close" style="
           display:none;
@@ -619,7 +661,7 @@
           background: rgba(255,255,255,.06); color:#fff;
           border-radius: 12px; padding: 10px 12px; font-size: 14px;
           cursor:pointer;
-        ">Beenden</button>
+        ">${t('btn_done')}</button>
 
         <button id="gtm-runner-restart" style="
           display:none;
@@ -627,7 +669,7 @@
           background: rgba(255,255,255,.85); color:#111;
           border-radius: 12px; padding: 10px 12px; font-size: 14px;
           cursor:pointer;
-        ">Neustarten</button>
+        ">${t('btn_restart')}</button>
       </div>
     `;
 
@@ -638,6 +680,47 @@
     Promise.resolve(applySavedPos(modal)).finally(() => {
       modal.style.visibility = 'visible';
     });
+
+    const applyStaticLabels = () => {
+      const titleEl = getEl('gtm-runner-title');
+      if (titleEl) titleEl.textContent = t('hdr_title');
+
+      const etaEl = getEl('gtm-runner-eta');
+      if (etaEl) etaEl.textContent = t('eta_label', '–');
+
+      const uploadLeft = getEl('gtm-runner-upload-left');
+      if (uploadLeft) uploadLeft.textContent = t('upload_label');
+
+      const filenameEl = getEl('gtm-runner-filename');
+      if (filenameEl && !getFilename()) filenameEl.textContent = t('upload_filename_none');
+
+      const clearBtn = getEl('gtm-runner-clear');
+      if (clearBtn) clearBtn.title = t('upload_clear_title');
+
+      const closeBtn = getEl('gtm-runner-close-btn');
+      if (closeBtn) closeBtn.title = t('btn_close_title');
+
+      const nextLabel = getEl('gtm-runner-next-label');
+      if (nextLabel) nextLabel.textContent = t('current_link');
+
+      const cdRow = getEl('gtm-runner-countdown-row');
+      if (cdRow) cdRow.innerHTML = `${t('countdown_prefix')} <span id="gtm-runner-countdown">3</span>${t('countdown_suffix')}`;
+
+      const btnCancel = getEl('gtm-runner-cancel');
+      const btnStart = getEl('gtm-runner-start');
+      const btnPause = getEl('gtm-runner-pause');
+      const btnResume = getEl('gtm-runner-resume');
+      const btnDone = getEl('gtm-runner-done-close');
+      const btnRestart = getEl('gtm-runner-restart');
+      if (btnCancel) btnCancel.textContent = t('btn_cancel');
+      if (btnStart) btnStart.textContent = t('btn_start');
+      if (btnPause) btnPause.textContent = t('btn_pause');
+      if (btnResume) btnResume.textContent = t('btn_resume');
+      if (btnDone) btnDone.textContent = t('btn_done');
+      if (btnRestart) btnRestart.textContent = t('btn_restart');
+    };
+
+    applyStaticLabels();
 
     const handle = getEl('gtm-runner-draghandle');
     if (handle) makeDraggable(modal, handle);
@@ -727,7 +810,7 @@
         setFilename('');
         setRunnerIndex(0);
         setUploadInvalidFlag(false);
-        if (filenameEl) filenameEl.textContent = 'Keine Datei ausgewählt';
+        if (filenameEl) filenameEl.textContent = t('upload_filename_none');
         updateUploadHint();
         renderState('upload');
       });
@@ -768,10 +851,10 @@
     const hasList = list.length > 0;
     const invalid = sessionStorage.getItem(STORAGE_KEY_UPLOAD_INVALID) === 'true';
     if (hasList) {
-      hint.textContent = `Gefunden: ${list.length} URLs (Not tagged)`;
+      hint.textContent = t('upload_hint_valid', String(list.length));
       hint.style.color = '#34A853';
     } else if (invalid) {
-      hint.textContent = 'Die hochgeladene CSV-Datei ist ungültig und/oder enthält keine nicht getaggten URLs.';
+      hint.textContent = t('upload_hint_invalid');
       hint.style.color = 'rgb(234, 67, 53)';
     } else {
       hint.textContent = '';
@@ -856,7 +939,7 @@
     const list = getUrls();
     const hasList = list.length > 0;
     const storedName = getFilename();
-    if (filenameEl && storedName) filenameEl.textContent = storedName;
+    if (filenameEl) filenameEl.textContent = storedName || t('upload_filename_none');
 
     if (uploadEl) uploadEl.style.display = state === 'running' || state === 'paused' || state === 'done' ? 'none' : 'block';
     if (runningUiEl) runningUiEl.style.display = state === 'running' || state === 'paused' || state === 'done' ? 'block' : 'none';
@@ -865,18 +948,15 @@
     if (linkWrapEl) linkWrapEl.style.display = state === 'done' ? 'none' : 'block';
 
     if (introEl) {
-      if (state === 'upload') introEl.textContent = 'Bitte laden Sie eine CSV aus Google® Tag Manager oder Google® Analytics 4 hoch. Nicht getaggte URLs werden hierbei automatisch herausgefiltert.';
-      else if (state === 'running') introEl.textContent = 'Der Vorgang wurde gestartet. Je nach Anzahl der URLs und Ladezeiten der Seiten kann dies einige Zeit in Anspruch nehmen.';
-      else if (state === 'paused') introEl.textContent = 'Der Vorgang wurde pausiert. Klicken Sie auf die Schaltfläche "Weiter", um fortzufahren.';
-      else if (state === 'done') introEl.textContent = 'Der Vorgang wurde erfolgreich abgeschlossen. Bitte prüfen Sie nun in ihrem Google® Tag Manager oder Google® Analytics 4 Konto die aktuelle Tag-Abdeckung und wiederholen Sie den Vorgang bei Bedarf.';
-      else introEl.textContent = 'Bitte laden Sie eine CSV aus Google® Tag Manager oder Google® Analytics 4 hoch. Nicht getaggte URLs werden hierbei automatisch herausgefiltert.';
+      if (state === 'upload') introEl.textContent = t('intro_upload');
+      else if (state === 'running') introEl.textContent = t('intro_running');
+      else if (state === 'paused') introEl.textContent = t('intro_paused');
+      else if (state === 'done') introEl.textContent = t('intro_done');
+      else introEl.textContent = hasList ? t('intro_idle_ready') : t('intro_idle_empty');
     }
 
     updateUploadHint();
     if (startBtn) setStartButtonEnabled(hasList && state !== 'done');
-    if (!hasList && state !== 'running' && state !== 'paused') {
-      showToast('Die hochgeladene CSV-Datei ist ungültig und/oder enthält keine nicht getaggten URLs. Bitte prüfen Sie die Datei und laden Sie sie erneut hoch.', 'error');
-    }
     setButtonsForState(state);
   }
 
@@ -897,7 +977,7 @@
     const state = sessionStorage.getItem(STORAGE_KEY_STATE) || 'idle';
 
     if (linkBox) linkBox.textContent = url || '–';
-    if (progressEl) progressEl.textContent = `${done} / ${total} URLs`;
+    if (progressEl) progressEl.textContent = `${done} / ${total} ${t('progress_urls')}`;
     if (percentEl) percentEl.textContent = `${pct}%`;
     if (barEl && !skipBar) {
       barEl.style.width = `${pct}%`;
@@ -912,7 +992,7 @@
         barEl.style.animation = 'gtmRunnerBarShimmer 1.6s linear infinite';
       }
     }
-    if (etaEl) etaEl.textContent = `Geschätzte Restzeit: ${formatDuration(etaMs)}`;
+    if (etaEl) etaEl.textContent = t('eta_prefix', formatDuration(etaMs));
     if (cdEl) cdEl.textContent = String(countdown);
     if (cdRow) {
       if (isLast) cdRow.style.display = 'none';

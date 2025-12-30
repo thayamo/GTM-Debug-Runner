@@ -5,11 +5,27 @@
   const status = document.getElementById('gtm-runner-status');
   const yearEl = document.getElementById('gtm-runner-year');
   const versionEl = document.getElementById('gtm-runner-version');
+  const titleEl = document.getElementById('gtm-popup-title');
+  const disclaimerEl = document.getElementById('gtm-popup-disclaimer');
+  const FALLBACK = {
+    popup_title: 'Debugger',
+    popup_status_on: 'GTM Debug Runner is active',
+    popup_status_off: 'GTM Debug Runner is inactive',
+    popup_disclaimer: 'Dieses Produkt steht in keiner Verbindung zu Google® LLC. Alle Marken sind Eigentum ihrer jeweiligen Inhaber.'
+  };
+
+  function t(key) {
+    if (chrome?.i18n?.getMessage) {
+      const m = chrome.i18n.getMessage(key);
+      if (m) return m;
+    }
+    return FALLBACK[key] || key;
+  }
 
   if (!toggle || !status || !chrome?.storage?.local) return;
 
   function updateStatus(on) {
-    status.textContent = on ? 'GTM Debug Runner ist aktiviert' : 'GTM Debug Runner ist deaktiviert';
+    status.textContent = on ? t('popup_status_on') : t('popup_status_off');
   }
 
   function setToggleDisabled(disabled) {
@@ -26,6 +42,9 @@
     const year = new Date().getFullYear();
     yearEl.textContent = `Copyright © ${year}`;
   }
+
+  if (titleEl) titleEl.textContent = t('popup_title');
+  if (disclaimerEl) disclaimerEl.textContent = t('popup_disclaimer');
 
   if (versionEl && chrome?.runtime?.getManifest) {
     const manifest = chrome.runtime.getManifest();

@@ -1,0 +1,41 @@
+{
+  "app_name": { "message": "GTM Debug Runner" },
+  "app_desc": { "message": "Unterstützt die Google®-Tag-Abdeckung, indem nicht getaggte Seiten automatisch aufgerufen und über den Google® Tag Manager korrekt erfasst werden." },
+
+  "hdr_title": { "message": "GTM Debug Runner" },
+  "eta_label": { "message": "ETA: $1" },
+
+  "intro_upload": { "message": "Bitte laden Sie eine CSV aus Google® Tag Manager oder Google® Analytics 4 hoch. Nicht getaggte URLs werden hierbei automatisch herausgefiltert." },
+  "intro_running": { "message": "Der Vorgang wurde gestartet. Je nach Anzahl der URLs und Ladezeiten der Seiten kann dies einige Zeit in Anspruch nehmen." },
+  "intro_paused": { "message": "Der Vorgang wurde pausiert. Klicken Sie auf die Schaltfläche \"Weiter\", um fortzufahren." },
+  "intro_done": { "message": "Der Vorgang wurde erfolgreich abgeschlossen. Bitte prüfen Sie nun in ihrem Google® Tag Manager oder Google® Analytics 4 Konto die aktuelle Tag-Abdeckung und wiederholen Sie den Vorgang bei Bedarf." },
+  "intro_idle_ready": { "message": "Die CSV-Datei wurde erfolgreich geladen. Klicken Sie nun auf die Schaltfläche \"Starten\", um den Vorgang zu beginnen." },
+  "intro_idle_empty": { "message": "Bitte laden Sie eine CSV (keine URL-Liste vorhanden)." },
+
+  "upload_label": { "message": "CSV auswählen" },
+  "upload_filename_none": { "message": "Keine Datei ausgewählt" },
+  "upload_hint_valid": { "message": "Gefunden: $1 URLs (Not tagged)" },
+  "upload_hint_invalid": { "message": "Die hochgeladene CSV-Datei ist ungültig und/oder enthält keine nicht getaggten URLs." },
+  "upload_clear_title": { "message": "Liste leeren" },
+
+  "current_link": { "message": "Aktueller Link" },
+  "countdown_prefix": { "message": "Nächster Redirect in" },
+  "countdown_suffix": { "message": "s" },
+
+  "btn_cancel": { "message": "Abbrechen" },
+  "btn_start": { "message": "Starten" },
+  "btn_pause": { "message": "Pause" },
+  "btn_resume": { "message": "Weiter" },
+  "btn_done": { "message": "Beenden" },
+  "btn_restart": { "message": "Neustarten" },
+  "btn_close_title": { "message": "Schließen" },
+
+  "progress_urls": { "message": "URLs" },
+  "done_url_label": { "message": "Fertig" },
+  "eta_prefix": { "message": "Geschätzte Restzeit: $1" },
+
+  "popup_title": { "message": "Debugger" },
+  "popup_status_on": { "message": "GTM Debug Runner ist aktiviert" },
+  "popup_status_off": { "message": "GTM Debug Runner ist deaktiviert" },
+  "popup_disclaimer": { "message": "Dieses Produkt steht in keiner Verbindung zu Google® LLC. Alle Marken sind Eigentum ihrer jeweiligen Inhaber." }
+}

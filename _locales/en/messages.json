@@ -1,0 +1,41 @@
+{
+  "app_name": { "message": "GTM Debug Runner" },
+  "app_desc": { "message": "Helps with Google® Tag coverage by automatically visiting untagged pages and tracking them via Google® Tag Manager." },
+
+  "hdr_title": { "message": "GTM Debug Runner" },
+  "eta_label": { "message": "ETA: $1" },
+
+  "intro_upload": { "message": "Please upload a CSV from Google® Tag Manager or Google® Analytics 4. Untagged URLs are filtered automatically." },
+  "intro_running": { "message": "The process has started. Depending on the number of URLs and page load times this may take a while." },
+  "intro_paused": { "message": "The process is paused. Click \"Resume\" to continue." },
+  "intro_done": { "message": "Done! Check your Google® Tag Manager or Google® Analytics 4 account for current tag coverage and rerun if needed." },
+  "intro_idle_ready": { "message": "CSV loaded successfully. Click \"Start\" to begin." },
+  "intro_idle_empty": { "message": "Please upload a CSV (no URL list available)." },
+
+  "upload_label": { "message": "Select CSV" },
+  "upload_filename_none": { "message": "No file selected" },
+  "upload_hint_valid": { "message": "Found: $1 URLs (Not tagged)" },
+  "upload_hint_invalid": { "message": "The uploaded CSV is invalid and/or contains no untagged URLs. Please check and try again." },
+  "upload_clear_title": { "message": "Clear list" },
+
+  "current_link": { "message": "Current link" },
+  "countdown_prefix": { "message": "Next redirect in" },
+  "countdown_suffix": { "message": "s" },
+
+  "btn_cancel": { "message": "Cancel" },
+  "btn_start": { "message": "Start" },
+  "btn_pause": { "message": "Pause" },
+  "btn_resume": { "message": "Resume" },
+  "btn_done": { "message": "Finish" },
+  "btn_restart": { "message": "Restart" },
+  "btn_close_title": { "message": "Close" },
+
+  "progress_urls": { "message": "URLs" },
+  "done_url_label": { "message": "Done" },
+  "eta_prefix": { "message": "ETA: $1" },
+
+  "popup_title": { "message": "Debugger" },
+  "popup_status_on": { "message": "GTM Debug Runner is active" },
+  "popup_status_off": { "message": "GTM Debug Runner is inactive" },
+  "popup_disclaimer": { "message": "This product is not affiliated with Google® LLC. All trademarks are the property of their respective owners." }
+}
