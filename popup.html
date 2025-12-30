@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>GTM Debug Runner</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: transparent;
+      color: #f5f7fb;
+      min-width: 280px;
+      box-sizing: border-box;
+    }
+    .panel {
+      background: #0f1115;
+      padding: 14px 16px;
+      border-radius: 0;
+      border: 1px solid rgba(255,255,255,0.12);
+      box-shadow: 0 14px 40px rgba(0,0,0,0.4);
+    }
+    .row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .title {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.1px;
+    }
+    .title svg {
+      position: relative;
+      top: 1px;
+    }
+    .status {
+      margin-top: 10px;
+      font-size: 12px;
+      opacity: 0.8;
+    }
+    .toggle {
+      position: relative;
+      width: 48px;
+      height: 26px;
+    }
+    .toggle input {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      margin: 0;
+    }
+    .toggle-bar {
+      position: absolute;
+      inset: 0;
+      border-radius: 999px;
+      background: #2a303b;
+      transition: background 0.2s ease;
+    }
+    .toggle-thumb {
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #f5f7fb;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+      transition: transform 0.2s ease;
+    }
+    .toggle input:checked ~ .toggle-bar {
+      background: #3b82f6;
+    }
+    .toggle input:checked ~ .toggle-thumb {
+      transform: translateX(22px);
+    }
+  </style>
+</head>
+<body>
+  <div class="panel">
+    <div class="row">
+      <div class="title">
+      <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 64 64" fill="none" style="position: relative; top: 1px">
+        <defs>
+          <linearGradient id="gradRed" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#EA4335"/>
+            <stop offset="100%" stop-color="#EA4335"/>
+          </linearGradient>
+          <linearGradient id="gradYellow" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#FBBC05"/>
+            <stop offset="100%" stop-color="#FBBC05"/>
+          </linearGradient>
+          <linearGradient id="gradBlue" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#4285F4"/>
+            <stop offset="100%" stop-color="#4285F4"/>
+          </linearGradient>
+          <linearGradient id="gradGreen" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#34A853"/>
+            <stop offset="100%" stop-color="#34A853"/>
+          </linearGradient>
+        </defs>
+        <g transform="translate(1 2) scale(2.6)">
+          <path d="M2 11.5a10 10 0 0 1 14.5-9.1" stroke="url(#gradRed)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M16.5 2.4a10 10 0 0 1 4.3 4.8" stroke="url(#gradYellow)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M22 12.5a10 10 0 0 1-6.5 8.6" stroke="url(#gradBlue)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M15.5 21.1a10 10 0 0 1-12.3-4.4" stroke="url(#gradGreen)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </g>
+      </svg>
+      GTM Debug Runner
+      </div>
+      <label class="toggle" title="Debugger aktivieren/deaktivieren">
+        <input id="gtm-runner-toggle" type="checkbox" />
+        <span class="toggle-bar"></span>
+        <span class="toggle-thumb"></span>
+      </label>
+    </div>
+    <div id="gtm-runner-status" class="status"></div>
+    <div style="margin-top:14px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.08); font-size:10px; color:rgba(245,247,251,0.55); line-height:1.4;">
+      Dieses Produkt steht in keiner Verbindung zu Google® LLC. Alle Marken sind Eigentum ihrer jeweiligen Inhaber.
+    </div>
+    <div style="display: flex; justify-content: space-between; margin-top: 10px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.08); font-size:10px; color:rgba(245,247,251,0.55); line-height:1.4;">
+       <span id="gtm-runner-year"></span>
+      <span id="gtm-runner-version"></span>
+    </div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>

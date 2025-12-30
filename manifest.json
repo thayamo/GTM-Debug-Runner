@@ -1,0 +1,30 @@
+{
+  "manifest_version": 3,
+  "name": "GTM Debug Runner",
+  "version": "1.0.1",
+  "description": "Unterstützt die Google®-Tag-Abdeckung, indem nicht getaggte Seiten automatisch aufgerufen und über den Google® Tag Manager korrekt erfasst werden.",
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "permissions": ["storage", "tabs"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "GTM Debug Runner",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png",
+      "48": "icons/icon-48.png",
+      "128": "icons/icon-128.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["gtm-debug-runner.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
